@@ -24,19 +24,27 @@
 *  THE SOFTWARE.
 */
 import * as React from "react";
+import powerbiVisualsApi from "powerbi-visuals-api";
+import DataViewTable = powerbiVisualsApi.DataViewTable;
 
+import {
+    VictoryChart,VictoryTheme,VictoryLine
+} from "victory";
 export interface State {
     textLabel: string,
     textValue: string,
     size: number,
+    length?:string,
+    splineData:Array<any>,
     background?: string,
-    borderWidth?: number
+    borderWidth?: number,
 }
 
 export const initialState: State = {
     textLabel: "",
     textValue: "",
-    size: 200
+    size: 200,
+    splineData:[]
 }
 
 export class ReactCircleCard extends React.Component<{}, State>{
@@ -65,18 +73,36 @@ export class ReactCircleCard extends React.Component<{}, State>{
     }
 
     render(){
-        const { textLabel, textValue, size, background, borderWidth } = this.state;
+        const { textLabel, textValue, size, background, borderWidth, splineData,length } = this.state;
+
 
         const style: React.CSSProperties = { width: size, height: size, background, borderWidth };
 
         return (
-            <div className="circleCard" style={style}>
-                <p>
-                    {textLabel}
-                    <br/>
-                    <em>{textValue}</em>
-                </p>
-            </div>
+            // <div className="circleCard" style={style}>
+            //     <p>
+            //         {splineData.length}
+            //         <br/>
+            //         <em>{textValue}</em>
+            //     </p>
+            // </div>
+            <VictoryChart
+            theme={VictoryTheme.material}
+            >
+            <VictoryLine
+                style={{
+                data: { stroke: "#c43a31" },
+                parent: { border: "1px solid #ccc"}
+                }}
+                data={splineData}
+                domain={{x: [1, 12], y: [0.925, 0.95]}}
+                animate={{
+                    duration: 2000,
+                    onLoad: { duration: 1000 }
+                  }}
+            />
+            </VictoryChart>
+            // <span>{splineData.length}</span>
         )
     }
 }

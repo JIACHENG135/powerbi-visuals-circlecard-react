@@ -1,9 +1,14 @@
 {
     "dataRoles": [
         {
-            "displayName": "Measure Data",
-            "name": "measure",
-            "kind": "Measure"
+            "displayName": "Column",
+            "name": "column",
+            "kind": "Grouping"
+        },
+        {
+            "displayName": "Value",
+            "name": "value",
+            "kind": "Grouping"
         }
     ],
     "objects": {
@@ -33,15 +38,21 @@
     },
     "dataViewMappings": [
         {
-            "conditions": [
-                {
-                    "measure": {
-                        "max": 1
-                    }
+            "table": {
+                "rows": {
+                    "select": [
+                        {
+                            "for": {
+                                "in": "column"
+                            }
+                        },
+                        {
+                            "for": {
+                                "in": "value"
+                            }
+                        }
+                    ]
                 }
-            ],
-            "single": {
-                "role": "measure"
             }
         }
     ]

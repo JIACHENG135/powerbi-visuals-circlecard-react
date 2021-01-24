@@ -33,6 +33,8 @@ import VisualConstructorOptions = powerbiVisualsApi.extensibility.visual.VisualC
 import VisualUpdateOptions = powerbiVisualsApi.extensibility.visual.VisualUpdateOptions;
 import IVisual = powerbiVisualsApi.extensibility.visual.IVisual;
 import DataView = powerbiVisualsApi.DataView;
+import DataViewTable = powerbiVisualsApi.DataViewTable;
+import DataViewTableRow = powerbiVisualsApi.DataViewTableRow;
 import IViewport = powerbiVisualsApi.IViewport;
 
 import VisualObjectInstance = powerbiVisualsApi.VisualObjectInstance;
@@ -41,11 +43,15 @@ import VisualObjectInstanceEnumerationObject = powerbiVisualsApi.VisualObjectIns
 
 import { ReactCircleCard, initialState } from "./component";
 import { VisualSettings } from "./settings";
+import {createInterpolatorWithFallback} from "commons-math-interpolation";
+import  bezier  from '@turf/bezier-spline';
+import { lineString } from '@turf/helpers';
 import "./../style/visual.less";
 
 export class Visual implements IVisual {
     private target: HTMLElement;
     private reactRoot: React.ComponentElement<any, any>;
+
     private settings: VisualSettings;
     private viewport: IViewport;
 
@@ -57,22 +63,71 @@ export class Visual implements IVisual {
     }
 
     public update(options: VisualUpdateOptions) {
-
+        let splineData = [];
+        let monthMap = new Map([
+            ["Jul",1],
+            ["Aug",2],
+            ["Sep",3],
+            ["Oct",4],
+            ["Nov",5],
+            ["Dec",6],
+            ["Jan",7],
+            ["Feb",8],
+            ["Mar",9],
+            ["Apr",10],
+            ["May",11],
+            ["Jun",12]
+        ]);
         if(options.dataViews && options.dataViews[0]){
             const dataView: DataView = options.dataViews[0];
+            const tableView: DataViewTable = dataView.table;
+            let xVals:Array<number> = [];
+            let yVals: Array<number> = [];
+            const InterpolationMethod = "cubic";
+            let splines = [];
+            
+            // tableView.rows.forEach((row:DataViewTableRow) => {
+            //     splineData.push({
+            //         x:monthMap.get(row[0].toString()),
+            //         y:row[1]
+            //     })
+            // })
+
+
+            tableView.rows.forEach((row:DataViewTableRow) => {
+                // xVals.push(monthMap.get(row[0].toString())),
+                // yVals.push(Math.floor(Math.random() * 10)),
+                splines.push([parseFloat(row[0].toString())*1.5,parseFloat(row[1].toString())])
+            })
+            var line = lineString(splines);
+            const curved = bezier(line);
+            // const interpolator = createInterpolatorWithFallback(InterpolationMethod, xVals, yVals);
+            var i = 0;
+            while(i<curved.geometry.coordinates.length){
+                splineData.push({
+                    x: curved.geometry.coordinates[i][0],
+                    y: curved.geometry.coordinates[i][1]
+                    // y: splines[i][1],
+                })
+                i = i + 1;
+            }
+
             this.viewport = options.viewport;
             const { width, height } = this.viewport;
-            const size = Math.min(width, height);
-
+            const size = tableView.rows.length;
+            const length = tableView.rows[1][1].toString();
             this.settings = <VisualSettings>VisualSettings.parse(dataView);
             const object = this.settings.circle;
             
             ReactCircleCard.update({
                 size,
+                length,
+                splineData,
                 borderWidth: object && object.circleThickness ? object.circleThickness : undefined,
                 background: object && object.circleColor ? object.circleColor : undefined,
-                textLabel: dataView.metadata.columns[0].displayName,
-                textValue: dataView.single.value.toString()
+                textLabel: tableView.rows.length.toString(),
+                // textValue: dataView.single.value.toString()
+                textValue: tableView.rows.length.toString(),
             });
         } else {
             this.clear();
