@@ -26,14 +26,25 @@
 import * as React from "react";
 import powerbiVisualsApi from "powerbi-visuals-api";
 import DataViewTable = powerbiVisualsApi.DataViewTable;
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
+import Grid from '@material-ui/core/Grid';
+
+
+
 
 import {
     VictoryChart,VictoryTheme,VictoryLine
 } from "victory";
+
+
+
 export interface State {
     textLabel: string,
     textValue: string,
     size: number,
+    selected?: string
     length?:string,
     splineData:Array<any>,
     background?: string,
@@ -43,10 +54,30 @@ export interface State {
 export const initialState: State = {
     textLabel: "",
     textValue: "",
+    selected: "cubic",
     size: 200,
     splineData:[]
 }
-
+const cartesianInterpolations = [
+    "basis",
+    "bundle",
+    "cardinal",
+    "catmullRom",
+    "linear",
+    "monotoneX",
+    "monotoneY",
+    "natural",
+    "step",
+    "stepAfter",
+    "stepBefore"
+  ];
+  
+  const polarInterpolations = [
+    "basis",
+    "cardinal",
+    "catmullRom",
+    "linear"
+  ];
 export class ReactCircleCard extends React.Component<{}, State>{
 
     private static updateCallback: (data: object) => void = null;
@@ -71,11 +102,15 @@ export class ReactCircleCard extends React.Component<{}, State>{
     public componentWillUnmount() {
         ReactCircleCard.updateCallback = null;
     }
+    public handleSelect(event: React.ChangeEvent<{ value: unknown }>) {
+        this.setState({
+            selected: event.target.value as string,
+        })
+      }
 
     render(){
-        const { textLabel, textValue, size, background, borderWidth, splineData,length } = this.state;
-
-
+        const { textLabel, textValue, size, background, borderWidth, splineData,length,selected } = this.state;
+        
         const style: React.CSSProperties = { width: size, height: size, background, borderWidth };
 
         return (
@@ -86,22 +121,157 @@ export class ReactCircleCard extends React.Component<{}, State>{
             //         <em>{textValue}</em>
             //     </p>
             // </div>
-            <VictoryChart
-            theme={VictoryTheme.material}
-            >
-            <VictoryLine
-                style={{
-                data: { stroke: "#c43a31" },
-                parent: { border: "1px solid #ccc"}
-                }}
-                data={splineData}
-                domain={{x: [1, 12], y: [0.925, 0.95]}}
-                animate={{
-                    duration: 2000,
-                    onLoad: { duration: 1000 }
-                  }}
-            />
-            </VictoryChart>
+            <div id="wrapper">
+                <Grid container spacing={4}>
+                    <Grid container xs={6}>
+                        <Grid item xs={12} id="interpolating-methods">
+                            <Select
+                            labelId="demo-simple-select-autowidth-label"
+                            id="demo-simple-select-autowidth"
+                            value={selected}
+                            onChange={this.handleSelect.bind(this)}
+                            autoWidth
+                            >
+                                <MenuItem value="">
+                                    <em>None</em>
+                                </MenuItem>
+                                <MenuItem value={10}>Ten</MenuItem>
+                                <MenuItem value={20}>Twenty</MenuItem>
+                                <MenuItem value={30}>Thirty</MenuItem>
+                            </Select>
+                        </Grid>
+                        <Grid item xs={12} >
+                            <VictoryChart
+                            theme={VictoryTheme.material}
+                            >
+                                <VictoryLine
+                                    style={{
+                                    data: { stroke: "#c43a31" },
+                                    parent: { border: "1px solid #ccc"}
+                                    }}
+                                    data={splineData}
+                                    domain={{x: [1, 12], y: [0.925, 0.95]}}
+                                    animate={{
+                                        duration: 2000,
+                                        onLoad: { duration: 1000 }
+                                    }}
+                                />
+                            </VictoryChart>
+                        </Grid>
+                    </Grid>
+                    <Grid container xs={6}>
+                        <Grid item xs={12} id="interpolating-methods">
+                            <Select
+                            labelId="demo-simple-select-autowidth-label"
+                            id="demo-simple-select-autowidth"
+                            value={selected}
+                            onChange={this.handleSelect.bind(this)}
+                            autoWidth
+                            >
+                                <MenuItem value="">
+                                    <em>None</em>
+                                </MenuItem>
+                                <MenuItem value={10}>Ten</MenuItem>
+                                <MenuItem value={20}>Twenty</MenuItem>
+                                <MenuItem value={30}>Thirty</MenuItem>
+                            </Select>
+                        </Grid>
+                        <Grid item xs={12} >
+                            <VictoryChart
+                            theme={VictoryTheme.material}
+                            >
+                                <VictoryLine
+                                    style={{
+                                    data: { stroke: "#c43a31" },
+                                    parent: { border: "1px solid #ccc"}
+                                    }}
+                                    data={splineData}
+                                    domain={{x: [1, 12], y: [0.925, 0.95]}}
+                                    animate={{
+                                        duration: 2000,
+                                        onLoad: { duration: 1000 }
+                                    }}
+                                />
+                            </VictoryChart>
+                        </Grid>
+                    </Grid>
+                    <Grid container xs={6}>
+                        <Grid item xs={12} id="interpolating-methods">
+                            <Select
+                            labelId="demo-simple-select-autowidth-label"
+                            id="demo-simple-select-autowidth"
+                            value={selected}
+                            onChange={this.handleSelect.bind(this)}
+                            autoWidth
+                            >
+                                <MenuItem value="">
+                                    <em>None</em>
+                                </MenuItem>
+                                <MenuItem value={10}>Ten</MenuItem>
+                                <MenuItem value={20}>Twenty</MenuItem>
+                                <MenuItem value={30}>Thirty</MenuItem>
+                            </Select>
+                        </Grid>
+                        <Grid item xs={12} >
+                            <VictoryChart
+                            theme={VictoryTheme.material}
+                            >
+                                <VictoryLine
+                                    style={{
+                                    data: { stroke: "#c43a31" },
+                                    parent: { border: "1px solid #ccc"}
+                                    }}
+                                    data={splineData}
+                                    domain={{x: [1, 12], y: [0.925, 0.95]}}
+                                    animate={{
+                                        duration: 2000,
+                                        onLoad: { duration: 1000 }
+                                    }}
+                                />
+                            </VictoryChart>
+                        </Grid>
+                    </Grid>
+                    <Grid container xs={6}>
+                        <Grid item xs={12} id="interpolating-methods">
+                            <Select
+                            labelId="demo-simple-select-autowidth-label"
+                            id="demo-simple-select-autowidth"
+                            value={selected}
+                            onChange={this.handleSelect.bind(this)}
+                            autoWidth
+                            >
+                                <MenuItem value="">
+                                    <em>None</em>
+                                </MenuItem>
+                                <MenuItem value={10}>Ten</MenuItem>
+                                <MenuItem value={20}>Twenty</MenuItem>
+                                <MenuItem value={30}>Thirty</MenuItem>
+                            </Select>
+                        </Grid>
+                        <Grid item xs={12} >
+                            <VictoryChart
+                            theme={VictoryTheme.material}
+                            >
+                                <VictoryLine
+                                    style={{
+                                    data: { stroke: "#c43a31" },
+                                    parent: { border: "1px solid #ccc"}
+                                    }}
+                                    data={splineData}
+                                    domain={{x: [1, 12], y: [0.925, 0.95]}}
+                                    animate={{
+                                        duration: 2000,
+                                        onLoad: { duration: 1000 }
+                                    }}
+                                />
+                            </VictoryChart>
+                        </Grid>
+                    </Grid> 
+                </Grid>
+
+
+            </div>
+
             // <span>{splineData.length}</span>
         )
     }
