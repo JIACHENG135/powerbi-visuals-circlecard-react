@@ -103,10 +103,10 @@ export class Visual implements IVisual {
             const curved = bezier(line);
             // const interpolator = createInterpolatorWithFallback(InterpolationMethod, xVals, yVals);
             var i = 0;
-            while(i<curved.geometry.coordinates.length){
+            while(i<line.geometry.coordinates.length){
                 splineData.push({
-                    x: curved.geometry.coordinates[i][0],
-                    y: curved.geometry.coordinates[i][1]
+                    x: line.geometry.coordinates[i][0],
+                    y: line.geometry.coordinates[i][1]
                     // y: splines[i][1],
                 })
                 i = i + 1;
@@ -121,6 +121,7 @@ export class Visual implements IVisual {
             
             ReactCircleCard.update({
                 size,
+                selected: "natural",
                 length,
                 splineData,
                 borderWidth: object && object.circleThickness ? object.circleThickness : undefined,

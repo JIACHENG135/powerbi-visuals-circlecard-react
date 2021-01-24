@@ -35,7 +35,7 @@ import Grid from '@material-ui/core/Grid';
 
 
 import {
-    VictoryChart,VictoryTheme,VictoryLine
+    VictoryChart,VictoryTheme,VictoryLine,VictoryScatter
 } from "victory";
 
 
@@ -44,7 +44,7 @@ export interface State {
     textLabel: string,
     textValue: string,
     size: number,
-    selected?: string
+    selected: "basis" | "bundle" | "cardinal"| "catmullRom"| "linear"|"monotoneX"| "monotoneY"| "natural"| "step"|"stepAfter"| "stepBefore",
     length?:string,
     splineData:Array<any>,
     background?: string,
@@ -54,7 +54,7 @@ export interface State {
 export const initialState: State = {
     textLabel: "",
     textValue: "",
-    selected: "cubic",
+    selected: "natural",
     size: 200,
     splineData:[]
 }
@@ -102,9 +102,9 @@ export class ReactCircleCard extends React.Component<{}, State>{
     public componentWillUnmount() {
         ReactCircleCard.updateCallback = null;
     }
-    public handleSelect(event: React.ChangeEvent<{ value: unknown }>) {
+    public handleSelect(event: React.ChangeEvent<{ value: "basis" | "bundle" | "cardinal"| "catmullRom"| "linear"|"monotoneX"| "monotoneY"| "natural"| "step"|"stepAfter"| "stepBefore" }>) {
         this.setState({
-            selected: event.target.value as string,
+            selected: event.target.value as "basis" | "bundle" | "cardinal"| "catmullRom"| "linear"|"monotoneX"| "monotoneY"| "natural"| "step"|"stepAfter"| "stepBefore",
         })
       }
 
@@ -125,7 +125,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
                 <Grid container spacing={4}>
                     <Grid container xs={6}>
                         <Grid item xs={12} id="interpolating-methods">
-                            <Select
+                            {/* <Select
                             labelId="demo-simple-select-autowidth-label"
                             id="demo-simple-select-autowidth"
                             value={selected}
@@ -138,7 +138,8 @@ export class ReactCircleCard extends React.Component<{}, State>{
                                 <MenuItem value={10}>Ten</MenuItem>
                                 <MenuItem value={20}>Twenty</MenuItem>
                                 <MenuItem value={30}>Thirty</MenuItem>
-                            </Select>
+                            </Select> */}
+                            <span>{splineData.length}</span>
                         </Grid>
                         <Grid item xs={12} >
                             <VictoryChart
@@ -155,6 +156,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
                                         duration: 2000,
                                         onLoad: { duration: 1000 }
                                     }}
+                                    interpolation="natural"
                                 />
                             </VictoryChart>
                         </Grid>
@@ -168,12 +170,18 @@ export class ReactCircleCard extends React.Component<{}, State>{
                             onChange={this.handleSelect.bind(this)}
                             autoWidth
                             >
-                                <MenuItem value="">
-                                    <em>None</em>
-                                </MenuItem>
-                                <MenuItem value={10}>Ten</MenuItem>
-                                <MenuItem value={20}>Twenty</MenuItem>
-                                <MenuItem value={30}>Thirty</MenuItem>
+                                <MenuItem value="basis">basis</MenuItem>
+                                <MenuItem value="bundle">bundle</MenuItem>
+                                <MenuItem value="cardinal">cardinal</MenuItem>
+                                <MenuItem value="catmullRom">catmullRom</MenuItem>
+                                <MenuItem value="linear">linear</MenuItem>
+                                <MenuItem value="monotoneX">monotoneX</MenuItem>
+                                <MenuItem value="monotoneY">monotoneY</MenuItem>
+                                <MenuItem value="step">step</MenuItem>
+                                <MenuItem value="stepAfter">stepAfter</MenuItem>
+                                <MenuItem value="stepBefore">stepBefore</MenuItem>
+                                <MenuItem value="natural">natural</MenuItem>
+
                             </Select>
                         </Grid>
                         <Grid item xs={12} >
@@ -185,6 +193,17 @@ export class ReactCircleCard extends React.Component<{}, State>{
                                     data: { stroke: "#c43a31" },
                                     parent: { border: "1px solid #ccc"}
                                     }}
+                                    data={splineData}
+                                    domain={{x: [1, 12], y: [0.925, 0.95]}}
+                                    animate={{
+                                        duration: 1000,
+                                        onLoad: { duration: 500 }
+                                    }}
+                                    interpolation={selected}
+                                />
+                                <VictoryScatter
+                                    style={{ data: { fill: "#c43a31" } }}
+                                    size={3}
                                     data={splineData}
                                     domain={{x: [1, 12], y: [0.925, 0.95]}}
                                     animate={{
