@@ -47,7 +47,7 @@ import {createInterpolatorWithFallback} from "commons-math-interpolation";
 import  bezier  from '@turf/bezier-spline';
 import { lineString } from '@turf/helpers';
 import "./../style/visual.less";
-
+import {TableDataParser} from "./tableDataParser";
 export class Visual implements IVisual {
     private target: HTMLElement;
     private reactRoot: React.ComponentElement<any, any>;
@@ -80,6 +80,7 @@ export class Visual implements IVisual {
         ]);
         if(options.dataViews && options.dataViews[0]){
             const dataView: DataView = options.dataViews[0];
+            const parser: TableDataParser = new TableDataParser(options);
             const tableView: DataViewTable = dataView.table;
             let xVals:Array<number> = [];
             let yVals: Array<number> = [];
@@ -115,7 +116,7 @@ export class Visual implements IVisual {
             this.viewport = options.viewport;
             const { width, height } = this.viewport;
             const size = tableView.rows.length;
-            const length = tableView.rows[1][1].toString();
+            const length = parser.data;
             this.settings = <VisualSettings>VisualSettings.parse(dataView);
             const object = this.settings.circle;
             

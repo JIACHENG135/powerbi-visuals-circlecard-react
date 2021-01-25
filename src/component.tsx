@@ -35,7 +35,7 @@ import Grid from '@material-ui/core/Grid';
 
 
 import {
-    VictoryChart,VictoryTheme,VictoryLine,VictoryScatter
+    VictoryChart,VictoryTheme,VictoryLine,VictoryScatter,VictoryLabel,VictoryBar,VictoryTooltip,VictoryAxis
 } from "victory";
 
 
@@ -45,7 +45,7 @@ export interface State {
     textValue: string,
     size: number,
     selected: "basis" | "bundle" | "cardinal"| "catmullRom"| "linear"|"monotoneX"| "monotoneY"| "natural"| "step"|"stepAfter"| "stepBefore",
-    length?:string,
+    length: Map<any,any>,
     splineData:Array<any>,
     background?: string,
     borderWidth?: number,
@@ -56,7 +56,8 @@ export const initialState: State = {
     textValue: "",
     selected: "natural",
     size: 200,
-    splineData:[]
+    splineData:[],
+    length: new Map(),
 }
 const cartesianInterpolations = [
     "basis",
@@ -113,6 +114,53 @@ export class ReactCircleCard extends React.Component<{}, State>{
         
         const style: React.CSSProperties = { width: size, height: size, background, borderWidth };
 
+        const lines = [];
+        const scatters = [];
+        const colors = new Map([
+            ["0","#fface4"],
+            ["1","#c43a31"]
+        ])
+        for (let key of length.keys()) {
+            lines.push(  
+                        
+                <VictoryLine
+                    style={{
+                    data: { stroke: colors.get(key) },
+                    parent: { border: "1px solid #ccc"}
+                    }}
+                    data={length.get(key)}
+                    domain={{x: [1, 12], y: [0.925, 0.95]}}
+                    animate={{
+                        duration: 1000,
+                        onLoad: { duration: 1000 }
+                    }}
+                    interpolation={selected}
+                />)
+            scatters.push(
+                <VictoryScatter
+                style={{ data: { fill: colors.get(key),opacity: ({ datum }) => datum.opacity || 1 } }}
+                size={3}
+                data={length.get(key)}
+                domain={{x: [1, 12], y: [0.925, 0.95]}}
+                labels={({ datum }) => datum.y}
+                labelComponent={<VictoryTooltip/>}
+                animate={{
+                    // animationWhitelist: ["style", "data", "size"], // Try removing "size"
+                    onExit: {
+                      duration: 500,
+                      before: () => ({ opacity: 0.3, _y: 0 })
+                    },
+                    duration: 1000,
+                    onLoad: { duration: 1000 },
+                    onEnter: {
+                      duration: 500,
+                      before: () => ({ opacity: 0.3, _y: 0 }),
+                      after: (datum) => ({ opacity: 1, _y: datum._y })
+                    }
+                  }}
+                />
+            )
+        }
         return (
             // <div className="circleCard" style={style}>
             //     <p>
@@ -123,47 +171,9 @@ export class ReactCircleCard extends React.Component<{}, State>{
             // </div>
             <div id="wrapper">
                 <Grid container spacing={4}>
-                    <Grid container xs={6}>
+                    <Grid container xs={12}>
                         <Grid item xs={12} id="interpolating-methods">
-                            {/* <Select
-                            labelId="demo-simple-select-autowidth-label"
-                            id="demo-simple-select-autowidth"
-                            value={selected}
-                            onChange={this.handleSelect.bind(this)}
-                            autoWidth
-                            >
-                                <MenuItem value="">
-                                    <em>None</em>
-                                </MenuItem>
-                                <MenuItem value={10}>Ten</MenuItem>
-                                <MenuItem value={20}>Twenty</MenuItem>
-                                <MenuItem value={30}>Thirty</MenuItem>
-                            </Select> */}
-                            <span>{splineData.length}</span>
-                        </Grid>
-                        <Grid item xs={12} >
-                            <VictoryChart
-                            theme={VictoryTheme.material}
-                            >
-                                <VictoryLine
-                                    style={{
-                                    data: { stroke: "#c43a31" },
-                                    parent: { border: "1px solid #ccc"}
-                                    }}
-                                    data={splineData}
-                                    domain={{x: [1, 12], y: [0.925, 0.95]}}
-                                    animate={{
-                                        duration: 2000,
-                                        onLoad: { duration: 1000 }
-                                    }}
-                                    interpolation="natural"
-                                />
-                            </VictoryChart>
-                        </Grid>
-                    </Grid>
-                    <Grid container xs={6}>
-                        <Grid item xs={12} id="interpolating-methods">
-                            <Select
+                        <Select
                             labelId="demo-simple-select-autowidth-label"
                             id="demo-simple-select-autowidth"
                             value={selected}
@@ -184,108 +194,18 @@ export class ReactCircleCard extends React.Component<{}, State>{
 
                             </Select>
                         </Grid>
-                        <Grid item xs={12} >
+                        <Grid id="chart" item xs={12} >
                             <VictoryChart
                             theme={VictoryTheme.material}
+                            height={200} width={400}
                             >
-                                <VictoryLine
-                                    style={{
-                                    data: { stroke: "#c43a31" },
-                                    parent: { border: "1px solid #ccc"}
-                                    }}
-                                    data={splineData}
-                                    domain={{x: [1, 12], y: [0.925, 0.95]}}
-                                    animate={{
-                                        duration: 1000,
-                                        onLoad: { duration: 500 }
-                                    }}
-                                    interpolation={selected}
-                                />
-                                <VictoryScatter
-                                    style={{ data: { fill: "#c43a31" } }}
-                                    size={3}
-                                    data={splineData}
-                                    domain={{x: [1, 12], y: [0.925, 0.95]}}
-                                    animate={{
-                                        duration: 2000,
-                                        onLoad: { duration: 1000 }
-                                    }}
-                                />
+                                <VictoryAxis style={{tickLabels :{fontSize: 5}}}/>
+                                <VictoryAxis style={{tickLabels :{fontSize: 5}}} dependentAxis/>
+                                {lines}
+                                {scatters}
                             </VictoryChart>
                         </Grid>
                     </Grid>
-                    <Grid container xs={6}>
-                        <Grid item xs={12} id="interpolating-methods">
-                            <Select
-                            labelId="demo-simple-select-autowidth-label"
-                            id="demo-simple-select-autowidth"
-                            value={selected}
-                            onChange={this.handleSelect.bind(this)}
-                            autoWidth
-                            >
-                                <MenuItem value="">
-                                    <em>None</em>
-                                </MenuItem>
-                                <MenuItem value={10}>Ten</MenuItem>
-                                <MenuItem value={20}>Twenty</MenuItem>
-                                <MenuItem value={30}>Thirty</MenuItem>
-                            </Select>
-                        </Grid>
-                        <Grid item xs={12} >
-                            <VictoryChart
-                            theme={VictoryTheme.material}
-                            >
-                                <VictoryLine
-                                    style={{
-                                    data: { stroke: "#c43a31" },
-                                    parent: { border: "1px solid #ccc"}
-                                    }}
-                                    data={splineData}
-                                    domain={{x: [1, 12], y: [0.925, 0.95]}}
-                                    animate={{
-                                        duration: 2000,
-                                        onLoad: { duration: 1000 }
-                                    }}
-                                />
-                            </VictoryChart>
-                        </Grid>
-                    </Grid>
-                    <Grid container xs={6}>
-                        <Grid item xs={12} id="interpolating-methods">
-                            <Select
-                            labelId="demo-simple-select-autowidth-label"
-                            id="demo-simple-select-autowidth"
-                            value={selected}
-                            onChange={this.handleSelect.bind(this)}
-                            autoWidth
-                            >
-                                <MenuItem value="">
-                                    <em>None</em>
-                                </MenuItem>
-                                <MenuItem value={10}>Ten</MenuItem>
-                                <MenuItem value={20}>Twenty</MenuItem>
-                                <MenuItem value={30}>Thirty</MenuItem>
-                            </Select>
-                        </Grid>
-                        <Grid item xs={12} >
-                            <VictoryChart
-                            theme={VictoryTheme.material}
-                            >
-                                <VictoryLine
-                                    style={{
-                                    data: { stroke: "#c43a31" },
-                                    parent: { border: "1px solid #ccc"}
-                                    }}
-                                    data={splineData}
-                                    domain={{x: [1, 12], y: [0.925, 0.95]}}
-                                    animate={{
-                                        duration: 2000,
-                                        onLoad: { duration: 1000 }
-                                    }}
-                                />
-                            </VictoryChart>
-                        </Grid>
-                    </Grid> 
                 </Grid>
 
 
