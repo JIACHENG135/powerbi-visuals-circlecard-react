@@ -39,10 +39,12 @@ import IViewport = powerbiVisualsApi.IViewport;
 
 import VisualObjectInstance = powerbiVisualsApi.VisualObjectInstance;
 import EnumerateVisualObjectInstancesOptions = powerbiVisualsApi.EnumerateVisualObjectInstancesOptions;
-import VisualObjectInstanceEnumerationObject = powerbiVisualsApi.VisualObjectInstanceEnumerationObject;
+import VisualObjectInstanceEnumeration = powerbiVisualsApi.VisualObjectInstanceEnumeration;
 
 import { ReactCircleCard, initialState } from "./component";
 import { VisualSettings } from "./settings";
+
+
 import {createInterpolatorWithFallback} from "commons-math-interpolation";
 import  bezier  from '@turf/bezier-spline';
 import { lineString } from '@turf/helpers';
@@ -69,10 +71,11 @@ export class Visual implements IVisual {
             const parser: CateDataParser = new CateDataParser(options);
             this.viewport = options.viewport;
             
-            // console.log(parser.colorSettings,parser.lineDatas);
-            this.settings = <VisualSettings>VisualSettings.parse(dataView);
+            this.settings = VisualSettings.parse<VisualSettings>(dataView);
             ReactCircleCard.update({
                 selected: "natural",
+                lineValue: this.settings.geoSetting.LineWidth,
+                pointValue: this.settings.geoSetting.ScatterSize,
                 colorSettings: parser.colorSettings,
                 lineDatas: parser.lineDatas,
                 canvasSettings: parser.canvasSettings
@@ -86,10 +89,8 @@ export class Visual implements IVisual {
         ReactCircleCard.update(initialState);
     }
 
-    public enumerateObjectInstances(
-        options: EnumerateVisualObjectInstancesOptions
-    ): VisualObjectInstance[] | VisualObjectInstanceEnumerationObject {
-
-        return VisualSettings.enumerateObjectInstances(this.settings || VisualSettings.getDefault(), options);
+    public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstanceEnumeration {
+        const settings: VisualSettings = this.settings || <VisualSettings>VisualSettings.getDefault();
+        return VisualSettings.enumerateObjectInstances(settings, options);
     }
 }

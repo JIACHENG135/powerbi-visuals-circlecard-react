@@ -7,25 +7,21 @@
         }
     ],
     "objects": {
-        "circle": {
-            "displayName": "Circle",
+        "geoSetting": {
+            "displayName": "GeoSetting",
             "properties": {
-                "circleColor": {
-                    "displayName": "Color",
-                    "description": "The fill color of the circle.",
+                "LineWidth": {
+                    "displayName": "LineWidth",
+                    "description": "The stroke with of lines",
                     "type": {
-                        "fill": {
-                            "solid": {
-                                "color": true
-                            }
-                        }
+                        "numeric":true
                     }
                 },
-                "circleThickness": {
-                    "displayName": "Thickness",
-                    "description": "The circle thickness.",
+                "ScatterSize": {
+                    "displayName": "ScatterSize",
+                    "description": "The radius of scatter points",
                     "type": {
-                        "numeric": true
+                        "numeric":true
                     }
                 }
             }

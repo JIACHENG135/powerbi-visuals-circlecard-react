@@ -29,12 +29,12 @@
 import { dataViewObjectsParser } from "powerbi-visuals-utils-dataviewutils";
 import DataViewObjectsParser = dataViewObjectsParser.DataViewObjectsParser;
 
-export class CircleSettings {
-    public circleColor: string = "white";
-    public circleThickness: number = 2;
+export class GeoSettings {
+    public LineWidth: number = 2;
+    public ScatterSize: number = 2;
 }
 
 export class VisualSettings extends DataViewObjectsParser {
-    public circle: CircleSettings = new CircleSettings();
+    public geoSetting: GeoSettings = new GeoSettings();
 }
 

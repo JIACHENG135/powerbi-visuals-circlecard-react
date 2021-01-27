@@ -30,6 +30,8 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import Grid from '@material-ui/core/Grid';
+import Slider from "@material-ui/core/Slider";
+import Input from "@material-ui/core/Input";
 
 
 
@@ -44,8 +46,9 @@ export interface State {
     selected: "basis" | "bundle" | "cardinal"| "catmullRom"| "linear"|"monotoneX"| "monotoneY"| "natural"| "step"|"stepAfter"| "stepBefore",
     colorSettings: ColorSettings,
     lineDatas: LineDatas,
-    canvasSettings: CanvasSettings
-
+    canvasSettings: CanvasSettings,
+    lineValue:number,
+    pointValue:number
 }
 
 export const initialState: State = {
@@ -72,8 +75,9 @@ export const initialState: State = {
             scatters:[],
             tickLabels: 10
         }
-    }
-
+    },
+    lineValue:2,
+    pointValue:2
 }
 const cartesianInterpolations = [
     "basis",
@@ -127,8 +131,8 @@ export class ReactCircleCard extends React.Component<{}, State>{
 
     render(){
         // const {  colorSettings,lineDatas,selected } = this.state;
-        const {colorSettings,selected,lineDatas,canvasSettings} = this.state;
-        console.log(canvasSettings)
+        const {colorSettings,selected,lineDatas,canvasSettings,lineValue,pointValue} = this.state;
+        console.log(lineValue)
         const lines = [];
         const scatters = [];
 
@@ -136,7 +140,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
             lines.push(  
                 <VictoryLine
                     style={{
-                    data: { stroke: colorSettings.lineColors[i],strokeWidth: canvasSettings.sizes.lines[i] },
+                    data: { stroke: colorSettings.lineColors[i],strokeWidth: lineValue ? lineValue/10 :canvasSettings.sizes.lines[i] },
                     parent: { border: "1px solid #ccc"}
                     }}
                     data={lineDatas.lineDatas[i]}
@@ -150,7 +154,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
             scatters.push(
                 <VictoryScatter
                 style={{ data: { fill: colorSettings.scatterColors[i],opacity: ({ datum }) => datum.opacity || 1 } }}
-                size={canvasSettings.sizes.scatters[i]}
+                size={pointValue ? pointValue/10 :canvasSettings.sizes.scatters[i]}
                 data={lineDatas.lineDatas[i]}
                 domain={{x: canvasSettings.domains.x, y: canvasSettings.domains.y}}
                 labels={({ datum }) => datum.y}
@@ -175,15 +179,16 @@ export class ReactCircleCard extends React.Component<{}, State>{
         return (
             <div id="wrapper">
                 <Grid container spacing={4}>
-                    <Grid container xs={12}>
-                        <Grid item xs={12} id="interpolating-methods">
-                        <Select
-                            labelId="demo-simple-select-autowidth-label"
-                            id="demo-simple-select-autowidth"
-                            value={selected}
-                            onChange={this.handleSelect.bind(this)}
-                            autoWidth
-                            >
+                    <Grid container xs={3} >
+                        <Grid item xs={12}/>
+                        <Grid item xs={12} className="interpolating-methods">
+                            <Select
+                                labelId="demo-simple-select-autowidth-label"
+                                id="demo-simple-select-autowidth"
+                                value={selected}
+                                onChange={this.handleSelect.bind(this)}
+                                autoWidth
+                                >
                                 <MenuItem value="basis">basis</MenuItem>
                                 <MenuItem value="bundle">bundle</MenuItem>
                                 <MenuItem value="cardinal">cardinal</MenuItem>
@@ -195,22 +200,23 @@ export class ReactCircleCard extends React.Component<{}, State>{
                                 <MenuItem value="stepAfter">stepAfter</MenuItem>
                                 <MenuItem value="stepBefore">stepBefore</MenuItem>
                                 <MenuItem value="natural">natural</MenuItem>
-
                             </Select>
                         </Grid>
-                        <Grid id="chart" item xs={12} >
-                            <VictoryChart
-                            theme={VictoryTheme.material}
-                            height={200} width={400}
-                            >
-                                <VictoryAxis style={{tickLabels :{fontSize: 5}}}/>
-                                <VictoryAxis style={{tickLabels :{fontSize: 5}}} dependentAxis/>
-                                {lines}
-                                {scatters}
-                            </VictoryChart>
-                        </Grid>
+                        <Grid item xs={12}/>
+                    </Grid>
+                    <Grid id="chart" item xs={12} >
+                        <VictoryChart
+                        theme={VictoryTheme.material}
+                        height={200} width={400}
+                        >
+                            <VictoryAxis style={{tickLabels :{fontSize: 5}}}/>
+                            <VictoryAxis style={{tickLabels :{fontSize: 5}}} dependentAxis/>
+                            {lines}
+                            {scatters}
+                        </VictoryChart>
                     </Grid>
                 </Grid>
+
             </div>
         )
     }
