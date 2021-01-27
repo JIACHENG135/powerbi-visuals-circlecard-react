@@ -1,12 +1,7 @@
 {
     "dataRoles": [
         {
-            "displayName": "Index",
-            "name": "column",
-            "kind": "Grouping"
-        },
-        {
-            "displayName": "Value",
+            "displayName": "Settings",
             "name": "value",
             "kind": "Grouping"
         }
@@ -38,20 +33,9 @@
     },
     "dataViewMappings": [
         {
-            "table": {
-                "rows": {
-                    "select": [
-                        {
-                            "for": {
-                                "in": "column"
-                            }
-                        },
-                        {
-                            "for": {
-                                "in": "value"
-                            }
-                        }
-                    ]
+            "categorical": {
+                "categories": {
+                    "for": { "in": "value" }
                 }
             }
         }

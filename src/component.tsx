@@ -38,26 +38,42 @@ import {
     VictoryChart,VictoryTheme,VictoryLine,VictoryScatter,VictoryLabel,VictoryBar,VictoryTooltip,VictoryAxis
 } from "victory";
 
-
+import {ColorSettings, LineDatas, CanvasSettings} from "./cateDataParser";
 
 export interface State {
-    textLabel: string,
-    textValue: string,
-    size: number,
     selected: "basis" | "bundle" | "cardinal"| "catmullRom"| "linear"|"monotoneX"| "monotoneY"| "natural"| "step"|"stepAfter"| "stepBefore",
-    length: Map<any,any>,
-    splineData:Array<any>,
-    background?: string,
-    borderWidth?: number,
+    colorSettings: ColorSettings,
+    lineDatas: LineDatas,
+    canvasSettings: CanvasSettings
+
 }
 
 export const initialState: State = {
-    textLabel: "",
-    textValue: "",
     selected: "natural",
-    size: 200,
-    splineData:[],
-    length: new Map(),
+    colorSettings:{
+        lineColors: [],
+        scatterColors: []
+    },
+    lineDatas:{
+        lineDatas:[]
+    },
+    canvasSettings:{
+        title:  "This is a interpolating tool",
+        domains:{
+            x: [-10,10],
+            y: [-10,10]
+        },
+        canvas:{
+            height: 200,
+            width: 400
+        },
+        sizes:{
+            lines:[],
+            scatters:[],
+            tickLabels: 10
+        }
+    }
+
 }
 const cartesianInterpolations = [
     "basis",
@@ -110,25 +126,20 @@ export class ReactCircleCard extends React.Component<{}, State>{
       }
 
     render(){
-        const { textLabel, textValue, size, background, borderWidth, splineData,length,selected } = this.state;
-        
-        const style: React.CSSProperties = { width: size, height: size, background, borderWidth };
-
+        // const {  colorSettings,lineDatas,selected } = this.state;
+        const {colorSettings,selected,lineDatas,canvasSettings} = this.state;
+        console.log(canvasSettings)
         const lines = [];
         const scatters = [];
-        const colors = new Map([
-            ["0","#fface4"],
-            ["1","#c43a31"]
-        ])
-        for (let key of length.keys()) {
+
+        for (let i=0;i<lineDatas.lineDatas.length;i++) {
             lines.push(  
-                        
                 <VictoryLine
                     style={{
-                    data: { stroke: colors.get(key) },
+                    data: { stroke: colorSettings.lineColors[i],strokeWidth: canvasSettings.sizes.lines[i] },
                     parent: { border: "1px solid #ccc"}
                     }}
-                    data={length.get(key)}
+                    data={lineDatas.lineDatas[i]}
                     domain={{x: [1, 12], y: [0.925, 0.95]}}
                     animate={{
                         duration: 1000,
@@ -138,10 +149,10 @@ export class ReactCircleCard extends React.Component<{}, State>{
                 />)
             scatters.push(
                 <VictoryScatter
-                style={{ data: { fill: colors.get(key),opacity: ({ datum }) => datum.opacity || 1 } }}
-                size={3}
-                data={length.get(key)}
-                domain={{x: [1, 12], y: [0.925, 0.95]}}
+                style={{ data: { fill: colorSettings.scatterColors[i],opacity: ({ datum }) => datum.opacity || 1 } }}
+                size={canvasSettings.sizes.scatters[i]}
+                data={lineDatas.lineDatas[i]}
+                domain={{x: canvasSettings.domains.x, y: canvasSettings.domains.y}}
                 labels={({ datum }) => datum.y}
                 labelComponent={<VictoryTooltip/>}
                 animate={{
@@ -162,13 +173,6 @@ export class ReactCircleCard extends React.Component<{}, State>{
             )
         }
         return (
-            // <div className="circleCard" style={style}>
-            //     <p>
-            //         {splineData.length}
-            //         <br/>
-            //         <em>{textValue}</em>
-            //     </p>
-            // </div>
             <div id="wrapper">
                 <Grid container spacing={4}>
                     <Grid container xs={12}>
@@ -207,11 +211,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
                         </Grid>
                     </Grid>
                 </Grid>
-
-
             </div>
-
-            // <span>{splineData.length}</span>
         )
     }
 }

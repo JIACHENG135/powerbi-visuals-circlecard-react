@@ -47,7 +47,7 @@ import {createInterpolatorWithFallback} from "commons-math-interpolation";
 import  bezier  from '@turf/bezier-spline';
 import { lineString } from '@turf/helpers';
 import "./../style/visual.less";
-import {TableDataParser} from "./tableDataParser";
+import {CateDataParser,ColorSettings,LineDatas} from "./cateDataParser";
 export class Visual implements IVisual {
     private target: HTMLElement;
     private reactRoot: React.ComponentElement<any, any>;
@@ -64,72 +64,18 @@ export class Visual implements IVisual {
 
     public update(options: VisualUpdateOptions) {
         let splineData = [];
-        let monthMap = new Map([
-            ["Jul",1],
-            ["Aug",2],
-            ["Sep",3],
-            ["Oct",4],
-            ["Nov",5],
-            ["Dec",6],
-            ["Jan",7],
-            ["Feb",8],
-            ["Mar",9],
-            ["Apr",10],
-            ["May",11],
-            ["Jun",12]
-        ]);
         if(options.dataViews && options.dataViews[0]){
             const dataView: DataView = options.dataViews[0];
-            const parser: TableDataParser = new TableDataParser(options);
-            const tableView: DataViewTable = dataView.table;
-            let xVals:Array<number> = [];
-            let yVals: Array<number> = [];
-            const InterpolationMethod = "cubic";
-            let splines = [];
-            
-            // tableView.rows.forEach((row:DataViewTableRow) => {
-            //     splineData.push({
-            //         x:monthMap.get(row[0].toString()),
-            //         y:row[1]
-            //     })
-            // })
-
-
-            tableView.rows.forEach((row:DataViewTableRow) => {
-                // xVals.push(monthMap.get(row[0].toString())),
-                // yVals.push(Math.floor(Math.random() * 10)),
-                splines.push([parseFloat(row[0].toString())*1.5,parseFloat(row[1].toString())])
-            })
-            var line = lineString(splines);
-            const curved = bezier(line);
-            // const interpolator = createInterpolatorWithFallback(InterpolationMethod, xVals, yVals);
-            var i = 0;
-            while(i<line.geometry.coordinates.length){
-                splineData.push({
-                    x: line.geometry.coordinates[i][0],
-                    y: line.geometry.coordinates[i][1]
-                    // y: splines[i][1],
-                })
-                i = i + 1;
-            }
-
+            const parser: CateDataParser = new CateDataParser(options);
             this.viewport = options.viewport;
-            const { width, height } = this.viewport;
-            const size = tableView.rows.length;
-            const length = parser.data;
-            this.settings = <VisualSettings>VisualSettings.parse(dataView);
-            const object = this.settings.circle;
             
+            // console.log(parser.colorSettings,parser.lineDatas);
+            this.settings = <VisualSettings>VisualSettings.parse(dataView);
             ReactCircleCard.update({
-                size,
                 selected: "natural",
-                length,
-                splineData,
-                borderWidth: object && object.circleThickness ? object.circleThickness : undefined,
-                background: object && object.circleColor ? object.circleColor : undefined,
-                textLabel: tableView.rows.length.toString(),
-                // textValue: dataView.single.value.toString()
-                textValue: tableView.rows.length.toString(),
+                colorSettings: parser.colorSettings,
+                lineDatas: parser.lineDatas,
+                canvasSettings: parser.canvasSettings
             });
         } else {
             this.clear();
