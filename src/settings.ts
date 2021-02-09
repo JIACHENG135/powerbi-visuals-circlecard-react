@@ -32,6 +32,8 @@ import DataViewObjectsParser = dataViewObjectsParser.DataViewObjectsParser;
 export class GeoSettings {
     public LineWidth: number = 2;
     public ScatterSize: number = 2;
+    public CanvasWidth: number = 400;
+    public CanvasHeight: number = 200;
 }
 
 export class VisualSettings extends DataViewObjectsParser {

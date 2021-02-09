@@ -17,7 +17,6 @@ interface DataPoint{
 export interface ColorSettings{
     lineColors: Array<string>,
     scatterColors: Array<string>
-
 }
 export interface CanvasSettings{
     title:  string,
@@ -25,7 +24,7 @@ export interface CanvasSettings{
         x: [number, number],
         y: [number, number]
     },
-    canvas:{
+    canvas?:{
         height: number,
         width: number
     },

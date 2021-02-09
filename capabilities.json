@@ -23,6 +23,20 @@
                     "type": {
                         "numeric":true
                     }
+                },
+                "CanvasWidth": {
+                    "displayName": "CanvasWidth",
+                    "description": "The width of the chart area",
+                    "type": {
+                        "numeric":true
+                    }
+                },
+                "CanvasHeight": {
+                    "displayName": "CanvasHeight",
+                    "description": "The width of the chart area",
+                    "type": {
+                        "numeric":true
+                    }
                 }
             }
         }

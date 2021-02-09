@@ -76,6 +76,8 @@ export class Visual implements IVisual {
                 selected: "natural",
                 lineValue: this.settings.geoSetting.LineWidth,
                 pointValue: this.settings.geoSetting.ScatterSize,
+                canvasHeight: this.settings.geoSetting.CanvasHeight,
+                canvasWidth: this.settings.geoSetting.CanvasWidth,
                 colorSettings: parser.colorSettings,
                 lineDatas: parser.lineDatas,
                 canvasSettings: parser.canvasSettings

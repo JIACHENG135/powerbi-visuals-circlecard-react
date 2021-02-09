@@ -48,7 +48,9 @@ export interface State {
     lineDatas: LineDatas,
     canvasSettings: CanvasSettings,
     lineValue:number,
-    pointValue:number
+    pointValue:number,
+    canvasWidth: number,
+    canvasHeight: number
 }
 
 export const initialState: State = {
@@ -77,7 +79,9 @@ export const initialState: State = {
         }
     },
     lineValue:2,
-    pointValue:2
+    pointValue:2,
+    canvasHeight: 200,
+    canvasWidth: 400
 }
 const cartesianInterpolations = [
     "basis",
@@ -131,7 +135,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
 
     render(){
         // const {  colorSettings,lineDatas,selected } = this.state;
-        const {colorSettings,selected,lineDatas,canvasSettings,lineValue,pointValue} = this.state;
+        const {colorSettings,selected,lineDatas,canvasSettings,lineValue,pointValue, canvasHeight, canvasWidth} = this.state;
         console.log(lineValue)
         const lines = [];
         const scatters = [];
@@ -207,7 +211,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
                     <Grid id="chart" item xs={12} >
                         <VictoryChart
                         theme={VictoryTheme.material}
-                        height={200} width={400}
+                        height={canvasHeight} width={canvasWidth}
                         >
                             <VictoryAxis style={{tickLabels :{fontSize: 5}}}/>
                             <VictoryAxis style={{tickLabels :{fontSize: 5}}} dependentAxis/>
