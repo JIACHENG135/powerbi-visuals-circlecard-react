@@ -80,7 +80,8 @@ export class Visual implements IVisual {
                 canvasWidth: this.settings.geoSetting.CanvasWidth,
                 colorSettings: parser.colorSettings,
                 lineDatas: parser.lineDatas,
-                canvasSettings: parser.canvasSettings
+                canvasSettings: parser.canvasSettings,
+                countryList: parser.countryList.countries
             });
         } else {
             this.clear();

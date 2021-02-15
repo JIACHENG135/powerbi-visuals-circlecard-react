@@ -32,7 +32,17 @@ import Select from '@material-ui/core/Select';
 import Grid from '@material-ui/core/Grid';
 import Slider from "@material-ui/core/Slider";
 import Input from "@material-ui/core/Input";
-
+import Button from "@material-ui/core/Button";
+import { withStyles, Theme, makeStyles } from '@material-ui/core/styles';
+import Tooltip, { TooltipProps } from '@material-ui/core/Tooltip';
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox, { CheckboxProps } from '@material-ui/core/Checkbox';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Typography from '@material-ui/core/Typography';
 
 
 
@@ -40,8 +50,17 @@ import {
     VictoryChart,VictoryTheme,VictoryLine,VictoryScatter,VictoryLabel,VictoryBar,VictoryTooltip,VictoryAxis
 } from "victory";
 
-import {ColorSettings, LineDatas, CanvasSettings} from "./cateDataParser";
+import {ColorSettings, LineDatas, CanvasSettings,CountryList} from "./cateDataParser";
 
+
+const LightTooltip = withStyles((theme: Theme) => ({
+    tooltip: {
+      backgroundColor: theme.palette.common.white,
+      color: 'rgba(0, 0, 0, 0.87)',
+      boxShadow: theme.shadows[1],
+      fontSize: 11,
+    },
+  }))(Tooltip);
 export interface State {
     selected: "basis" | "bundle" | "cardinal"| "catmullRom"| "linear"|"monotoneX"| "monotoneY"| "natural"| "step"|"stepAfter"| "stepBefore",
     colorSettings: ColorSettings,
@@ -50,7 +69,8 @@ export interface State {
     lineValue:number,
     pointValue:number,
     canvasWidth: number,
-    canvasHeight: number
+    canvasHeight: number,
+    countryList: Map<string,boolean>
 }
 
 export const initialState: State = {
@@ -60,7 +80,8 @@ export const initialState: State = {
         scatterColors: []
     },
     lineDatas:{
-        lineDatas:[]
+        lineDatas:[],
+        countries: []
     },
     canvasSettings:{
         title:  "This is a interpolating tool",
@@ -81,7 +102,8 @@ export const initialState: State = {
     lineValue:2,
     pointValue:2,
     canvasHeight: 200,
-    canvasWidth: 400
+    canvasWidth: 400,
+    countryList: new Map<string,boolean>()
 }
 const cartesianInterpolations = [
     "basis",
@@ -124,6 +146,10 @@ export class ReactCircleCard extends React.Component<{}, State>{
         ReactCircleCard.updateCallback = (newState: State): void => { this.setState(newState); };
     }
 
+    public onchange(value) {
+        // console.log(value);
+    }
+
     public componentWillUnmount() {
         ReactCircleCard.updateCallback = null;
     }
@@ -132,59 +158,111 @@ export class ReactCircleCard extends React.Component<{}, State>{
             selected: event.target.value as "basis" | "bundle" | "cardinal"| "catmullRom"| "linear"|"monotoneX"| "monotoneY"| "natural"| "step"|"stepAfter"| "stepBefore",
         })
       }
-
+    
+    public handleCheck(event: React.ChangeEvent<HTMLInputElement>){
+        // console.log(event.target.checked)
+        const nextRows = new Map(this.state.countryList)
+        nextRows.set(event.target.name,event.target.checked)
+        this.setState({
+            countryList:nextRows
+        })
+    }
     render(){
         // const {  colorSettings,lineDatas,selected } = this.state;
-        const {colorSettings,selected,lineDatas,canvasSettings,lineValue,pointValue, canvasHeight, canvasWidth} = this.state;
-        console.log(lineValue)
+        const {colorSettings,selected,lineDatas,canvasSettings,lineValue,pointValue, canvasHeight, canvasWidth, countryList} = this.state;
+        // console.log(lineValue)
         const lines = [];
         const scatters = [];
-
-        for (let i=0;i<lineDatas.lineDatas.length;i++) {
-            lines.push(  
-                <VictoryLine
-                    style={{
-                    data: { stroke: colorSettings.lineColors[i],strokeWidth: lineValue ? lineValue/10 :canvasSettings.sizes.lines[i] },
-                    parent: { border: "1px solid #ccc"}
-                    }}
-                    data={lineDatas.lineDatas[i]}
-                    domain={{x: [1, 12], y: [0.925, 0.95]}}
-                    animate={{
-                        duration: 1000,
-                        onLoad: { duration: 1000 }
-                    }}
-                    interpolation={selected}
-                />)
-            scatters.push(
-                <VictoryScatter
-                style={{ data: { fill: colorSettings.scatterColors[i],opacity: ({ datum }) => datum.opacity || 1 } }}
-                size={pointValue ? pointValue/10 :canvasSettings.sizes.scatters[i]}
-                data={lineDatas.lineDatas[i]}
-                domain={{x: canvasSettings.domains.x, y: canvasSettings.domains.y}}
-                labels={({ datum }) => datum.y}
-                labelComponent={<VictoryTooltip/>}
-                animate={{
-                    // animationWhitelist: ["style", "data", "size"], // Try removing "size"
-                    onExit: {
-                      duration: 500,
-                      before: () => ({ opacity: 0.3, _y: 0 })
-                    },
-                    duration: 1000,
-                    onLoad: { duration: 1000 },
-                    onEnter: {
-                      duration: 500,
-                      before: () => ({ opacity: 0.3, _y: 0 }),
-                      after: (datum) => ({ opacity: 1, _y: datum._y })
-                    }
-                  }}
+        // <FormControlLabel
+        //     control={<Checkbox checked={state.checkedA} onChange={handleChange} name="checkedA" />}
+        //     label="Secondary"
+        // />
+        // <FormControlLabel
+        //     control={
+        //     <Checkbox
+        //         checked={state.checkedB}
+        //         onChange={handleChange}
+        //         name="checkedB"
+        //         color="primary"
+        //     />
+        //     }
+        //     label="Primary"
+        // />
+        const checkBoxes = []
+        countryList.forEach((value:boolean,key:string) => {
+            checkBoxes.push(
+                <FormControlLabel
+                    control={<Checkbox checked={countryList.get(key)} onChange={this.handleCheck.bind(this)} name={key} />}
+                    label={key}
                 />
             )
+        })
+        for (let i=0;i<lineDatas.lineDatas.length;i++) {
+            if(countryList.get(lineDatas.countries[i])){
+                lines.push(  
+                    <VictoryLine
+                        style={{
+                        data: { stroke: colorSettings.lineColors[i],strokeWidth: lineValue ? lineValue/10 :canvasSettings.sizes.lines[i] },
+                        parent: { border: "1px solid #ccc"}
+                        }}
+                        data={lineDatas.lineDatas[i]}
+                        domain={{x: [1, 12], y: [0.925, 0.95]}}
+                        animate={{
+                            duration: 1000,
+                            onLoad: { duration: 1000 }
+                        }}
+                        interpolation={selected}
+                    />)
+                scatters.push(
+                    <VictoryScatter
+                    style={{ data: { fill: colorSettings.scatterColors[i],opacity: ({ datum }) => datum.opacity || 1 } }}
+                    size={pointValue ? pointValue/10 :canvasSettings.sizes.scatters[i]}
+                    data={lineDatas.lineDatas[i]}
+                    domain={{x: canvasSettings.domains.x, y: canvasSettings.domains.y}}
+                    labels={({ datum }) => datum.y}
+                    labelComponent={<VictoryTooltip/>}
+                    animate={{
+                        // animationWhitelist: ["style", "data", "size"], // Try removing "size"
+                        onExit: {
+                          duration: 500,
+                          before: () => ({ opacity: 0.3, _y: 0 })
+                        },
+                        duration: 1000,
+                        onLoad: { duration: 1000 },
+                        onEnter: {
+                          duration: 500,
+                          before: () => ({ opacity: 0.3, _y: 0 }),
+                          after: (datum) => ({ opacity: 1, _y: datum._y })
+                        }
+                      }}
+                    />
+                )
+            }
+
         }
         return (
             <div id="wrapper">
-                <Grid container spacing={4}>
-                    <Grid container xs={3} >
-                        <Grid item xs={12}/>
+                <Grid container>
+                    <Grid container xs={2}>
+                        <Grid item xs={12}>
+                            <Accordion>
+                                <AccordionSummary
+                                expandIcon={<ExpandMoreIcon />}
+                                aria-controls="panel1a-content"
+                                id="panel1a-header"
+                                >
+                                <Typography>Counties</Typography>
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    <FormGroup>
+                                        {checkBoxes}
+                                    </FormGroup>
+                                </AccordionDetails>
+                            </Accordion>
+                        </Grid>
+                    </Grid>
+
+                    <Grid id="chart" item xs={10} >
                         <Grid item xs={12} className="interpolating-methods">
                             <Select
                                 labelId="demo-simple-select-autowidth-label"
@@ -206,18 +284,17 @@ export class ReactCircleCard extends React.Component<{}, State>{
                                 <MenuItem value="natural">natural</MenuItem>
                             </Select>
                         </Grid>
-                        <Grid item xs={12}/>
-                    </Grid>
-                    <Grid id="chart" item xs={12} >
-                        <VictoryChart
-                        theme={VictoryTheme.material}
-                        height={canvasHeight} width={canvasWidth}
-                        >
-                            <VictoryAxis style={{tickLabels :{fontSize: 5}}}/>
-                            <VictoryAxis style={{tickLabels :{fontSize: 5}}} dependentAxis/>
-                            {lines}
-                            {scatters}
-                        </VictoryChart>
+                        <Grid item xs={12}>
+                            <VictoryChart
+                            theme={VictoryTheme.material}
+                            height={canvasHeight} width={canvasWidth}
+                            >
+                                <VictoryAxis style={{tickLabels :{fontSize: 5}}}/>
+                                <VictoryAxis style={{tickLabels :{fontSize: 5}}} dependentAxis/>
+                                {lines}
+                                {scatters}
+                            </VictoryChart>
+                        </Grid>
                     </Grid>
                 </Grid>
 
