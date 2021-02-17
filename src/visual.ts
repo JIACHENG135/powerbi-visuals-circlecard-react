@@ -1,28 +1,6 @@
-/*
-*  Power BI Visual CLI
-*
-*  Copyright (c) Microsoft Corporation
-*  All rights reserved.
-*  MIT License
-*
-*  Permission is hereby granted, free of charge, to any person obtaining a copy
-*  of this software and associated documentation files (the ""Software""), to deal
-*  in the Software without restriction, including without limitation the rights
-*  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-*  copies of the Software, and to permit persons to whom the Software is
-*  furnished to do so, subject to the following conditions:
-*
-*  The above copyright notice and this permission notice shall be included in
-*  all copies or substantial portions of the Software.
-*
-*  THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-*  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-*  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-*  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-*  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-*  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-*  THE SOFTWARE.
-*/
+/**
+ * Developed by Yiwen Zhou, Data Scientist at Microsoft
+ */
 "use strict";
 import "core-js";
 import * as React from "react";
@@ -42,14 +20,15 @@ import EnumerateVisualObjectInstancesOptions = powerbiVisualsApi.EnumerateVisual
 import VisualObjectInstanceEnumeration = powerbiVisualsApi.VisualObjectInstanceEnumeration;
 
 import { ReactCircleCard, initialState } from "./component";
-import { VisualSettings } from "./settings";
+import { VisualSettings } from "./settings/settings";
 
 
 import {createInterpolatorWithFallback} from "commons-math-interpolation";
 import  bezier  from '@turf/bezier-spline';
 import { lineString } from '@turf/helpers';
 import "./../style/visual.less";
-import {CateDataParser,ColorSettings,LineDatas} from "./cateDataParser";
+import {TableDataParser} from "./tableDataParser";
+// import {CateDataParser,ColorSettings,LineDatas} from "./cateDataParser";
 export class Visual implements IVisual {
     private target: HTMLElement;
     private reactRoot: React.ComponentElement<any, any>;
@@ -60,28 +39,26 @@ export class Visual implements IVisual {
     constructor(options: VisualConstructorOptions) {
         this.reactRoot = React.createElement(ReactCircleCard, {});
         this.target = options.element;
-
         ReactDOM.render(this.reactRoot, this.target);
     }
-
     public update(options: VisualUpdateOptions) {
-        let splineData = [];
         if(options.dataViews && options.dataViews[0]){
             const dataView: DataView = options.dataViews[0];
-            const parser: CateDataParser = new CateDataParser(options);
+            const parser: TableDataParser = new TableDataParser(options);
             this.viewport = options.viewport;
-            
             this.settings = VisualSettings.parse<VisualSettings>(dataView);
+            console.log("Test settings",this.settings)
+            const {countryMap, valueMap, domain} = parser;
             ReactCircleCard.update({
-                selected: "natural",
+                countryMap: countryMap,
+                valueMap: valueMap,
+                selected: 'natural',
                 lineValue: this.settings.geoSetting.LineWidth,
                 pointValue: this.settings.geoSetting.ScatterSize,
                 canvasHeight: this.settings.geoSetting.CanvasHeight,
                 canvasWidth: this.settings.geoSetting.CanvasWidth,
-                colorSettings: parser.colorSettings,
-                lineDatas: parser.lineDatas,
-                canvasSettings: parser.canvasSettings,
-                countryList: parser.countryList.countries
+                lineSetting: this.settings.geoSetting.Interpolation,
+                domain: domain
             });
         } else {
             this.clear();
