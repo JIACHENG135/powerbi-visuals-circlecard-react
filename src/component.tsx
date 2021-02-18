@@ -247,7 +247,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
         return (
             <div id="wrapper">
                 <Grid container>
-                    <Grid container xs={2}>
+                    {/* <Grid container xs={2}>
                         <Grid item xs={12}>
                             <Accordion>
                                 <AccordionSummary
@@ -264,7 +264,7 @@ export class ReactCircleCard extends React.Component<{}, State>{
                                 </AccordionDetails>
                             </Accordion>
                         </Grid>
-                    </Grid>
+                    </Grid> */}
 
                     <Grid id="chart" item xs={10} >
                         <Grid item xs={12} className="interpolating-methods">
@@ -274,18 +274,19 @@ export class ReactCircleCard extends React.Component<{}, State>{
                                 value={selected}
                                 onChange={this.handleSelect.bind(this)}
                                 autoWidth
+                                style={{fontSize: '15px'}}
                                 >
-                                <MenuItem value="basis">basis</MenuItem>
-                                <MenuItem value="bundle">bundle</MenuItem>
-                                <MenuItem value="cardinal">cardinal</MenuItem>
-                                <MenuItem value="catmullRom">catmullRom</MenuItem>
-                                <MenuItem value="linear">linear</MenuItem>
-                                <MenuItem value="monotoneX">monotoneX</MenuItem>
-                                <MenuItem value="monotoneY">monotoneY</MenuItem>
-                                <MenuItem value="step">step</MenuItem>
-                                <MenuItem value="stepAfter">stepAfter</MenuItem>
-                                <MenuItem value="stepBefore">stepBefore</MenuItem>
-                                <MenuItem value="natural">natural</MenuItem>
+                                <MenuItem value="basis" style={{fontSize: '15px'}}>basis</MenuItem>
+                                <MenuItem value="bundle" style={{fontSize: '15px'}}>bundle</MenuItem>
+                                <MenuItem value="cardinal" style={{fontSize: '15px'}}>cardinal</MenuItem>
+                                <MenuItem value="catmullRom" style={{fontSize: '15px'}}>catmullRom</MenuItem>
+                                <MenuItem value="linear" style={{fontSize: '15px'}}>linear</MenuItem>
+                                <MenuItem value="monotoneX" style={{fontSize: '15px'}}>monotoneX</MenuItem>
+                                <MenuItem value="monotoneY" style={{fontSize: '15px'}}>monotoneY</MenuItem>
+                                <MenuItem value="step" style={{fontSize: '15px'}}>step</MenuItem>
+                                <MenuItem value="stepAfter" style={{fontSize: '15px'}}>stepAfter</MenuItem>
+                                <MenuItem value="stepBefore" style={{fontSize: '15px'}}>stepBefore</MenuItem>
+                                <MenuItem value="natural" style={{fontSize: '15px'}}>natural</MenuItem>
                             </Select>
                         </Grid>
                         <Grid item xs={12}>

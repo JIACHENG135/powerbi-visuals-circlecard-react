@@ -42,7 +42,7 @@ export class TableDataParser{
         // }
         this.domain = {
             x:[12,12],
-            y:[1,1]
+            y:[0.9,0.95]
         }
         table.rows.forEach((row: DataViewTableRow) => {
             var value:ValueTuple = {
@@ -63,10 +63,13 @@ export class TableDataParser{
             }else{
                 var prevValue = new Array<ValueTuple>();
             }
+
             this.countryMap.set(key,true);
             prevValue.push(value);
             initalMap.set(key,prevValue)
         })
+        this.domain.x[0] -= 1
+        this.domain.y[0] -= 0.01
         initalMap.forEach((value: ValueTuple[],key: string) =>{
             var sortedValue: ValueTuple[] = value.sort((v1:ValueTuple,v2:ValueTuple) => v1.index - v2.index);
             this.valueMap.set(key,sortedValue);

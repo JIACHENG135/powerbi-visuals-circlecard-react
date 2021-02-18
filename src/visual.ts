@@ -52,7 +52,7 @@ export class Visual implements IVisual {
             ReactCircleCard.update({
                 countryMap: countryMap,
                 valueMap: valueMap,
-                selected: 'natural',
+                selected: 'linear',
                 lineValue: this.settings.geoSetting.LineWidth,
                 pointValue: this.settings.geoSetting.ScatterSize,
                 canvasHeight: this.settings.geoSetting.CanvasHeight,
